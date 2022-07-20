@@ -1,0 +1,117 @@
+trainer: MCNTrainer
+K: 3
+rotation_axes: &rotation_axes [0, 0, 1] # horizontal, depth, vertical
+body_reference: &body_reference False
+
+global_range: [0.5, 2.0]
+local_range: [0.5, 2.0]
+
+# model options
+n_joints: 15
+seq_len: 64                   # length of motion sequence
+
+# logger options
+snapshot_save_iter: 20000     # How often do you want to save trained models
+log_iter: 40                  # How often do you want to log the training stats
+val_iter: 400
+val_batches: 10
+
+# optimization options
+max_iter: 200000              # maximum number of training iterations
+batch_size: 64                # batch size
+weight_decay: 0.0001          # weight decay
+beta1: 0.5                    # Adam parameter
+beta2: 0.999                  # Adam parameter
+init: kaiming                 # initialization [gaussian/kaiming/xavier/orthogonal]
+lr: 0.0001                    # initial learning rate
+lr_policy: step               # learning rate scheduler
+step_size: 20000              # how often to decay learning rate
+gamma: 0.5                    # how much to decay learning rate
+
+dynamic_view_perturb: 1
+
+trans_gan_w: 2
+recon_x_w: 15                 # weight of image reconstruction loss
+cross_x_w: 0
+
+inv_v_ls_w: 2
+inv_m_ls_w: 2
+
+inv_b_trans_w: 2            
+inv_m_trans_w: 2            
+inv_X_trans_w: 10
+inv_x_trans_w: 0
+
+cs_decay: 0
+sc_inv_x_w: 0
+sc_inv_X_w: 10
+
+vc_inv_reenc_w: 1
+vc_inv_cv_w: 0
+
+sc_inv_reenc_w: 1
+sc_inv_cs_w: 0
+
+triplet_b_w: 80               # weight of body triplet loss
+triplet_v_w: 0               # weight of view triplet loss
+triplet_margin: 0.2
+triplet_neg_range: [0.0, 0.5]
+
+stable_w: 0
+body_gan_w: 0
+
+autoencoder:
+  cls: Autoencoder3fCanonical
+  body_reference: *body_reference
+  motion_encoder:
+    cls: ConvEncoder
+    channels: [30, 64, 128, 128]
+    padding: 3
+    kernel_size: 8
+    conv_stride: 2
+    conv_pool: null
+  body_encoder:
+    cls: ConvEncoder
+    channels: [28, 64, 128, 256]
+    padding: 2
+    kernel_size: 7
+    conv_stride: 1
+    conv_pool: MaxPool1d
+    global_pool: max_pool1d
+  view_encoder:
+    cls: ConvEncoder
+    channels: [28, 64, 32, 6]
+    padding: 3
+    kernel_size: 7
+    conv_stride: 1
+    conv_pool: null
+    global_pool: null
+  decoder:
+    channels: [384, 256, 128, 45]
+    kernel_size: 7
+
+discriminator:
+  encoder_cls: ConvEncoder
+  gan_type: lsgan
+  channels: [30, 64, 96, 128]
+  padding: 3
+  kernel_size: 8
+  conv_stride: 2
+  conv_pool: null
+
+
+# data options
+data:
+  train_cls: SoloDanceFullDataset1x
+  eval_cls: Mixamo2DFullDataset2x
+  global_range: [0.5, 2.0]
+  local_range: [0.5, 2.0]
+  rotation_axes: [0, 0, 1]
+  unit: 128
+  train_dir: ./data/solo_dance/loose
+  test_dir: ./data/mixamo/36_800_24/test
+  num_workers: 4
+  train_meanpose_path: ./data/mixamo/36_800_24/meanpose_with_view.npy
+  train_stdpose_path: ./data/mixamo/36_800_24/stdpose_with_view.npy
+  test_meanpose_path: ./data/mixamo/36_800_24/meanpose_with_view.npy
+  test_stdpose_path: ./data/mixamo/36_800_24/stdpose_with_view.npy
