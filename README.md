@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 ## Data
 
-We use the Mixamo and SoloDancer datasets. Please refer to [TransMoMo](https://github.com/yzhq97/transmomo.pytorch) for detailed instructions.
+We use the Mixamo and SoloDancer datasets. Please refer to [TransMoMo](https://github.com/yzhq97/transmomo.pytorch#data) for detailed instructions.
 
 ## Training
 
